@@ -4,27 +4,24 @@
  #include <LiquidCrystal_I2C.h>
 
  LiquidCrystal_I2C lcd(0x27, 16, 2);
-  //pines de los motores
+
+ // pines de los motores
   const int IN1 = 8;
   const int IN2 = 9;
   const int ENA = 10;
   const int IN3 = 6;
   const int IN4 = 7;
   const int ENB = 5;
-  //sensores ultrasonicos 
+
+// pines sensores ultrasonicos 
   const int TRIG_F = 22;
   const int ECHO_F = 23;
   const int TRIG_I = 24;
   const int ECHO_I = 25;
   const int TRIG_D = 26;
   const int ECHO_D = 27;
-//velocidad de los motores
-  const int UMBRAL = 5;      
-  const int VELOCIDAD = 180;  // 0-255
-  const int VELOCIDAD_GIRO = 150;
 
-  long distFrente, distIzquierda, distDerecha;
-// sensores infrarrojos
+// pines sensores infrarrojos
   const int IR_IZQ = 30;
   const int IR_DER = 31;
 
@@ -34,9 +31,20 @@
   const int pinS2 = 4;
   const int pinS3 = 11;
   const int pinOut = 12;
+
+//velocidad de los motores
+  const int UMBRAL = 5;      
+  const int VELOCIDAD = 180;  // 0-255
+  const int VELOCIDAD_GIRO = 150;
+
+  long distFrente, distIzquierda, distDerecha;
+
+// variables canales rgb
   int redFrequency = 0;
   int greenFrequency = 0;
   int blueFrequency = 0;
+
+  String lastDisplayedColor = "";
 
 // determinante de funciones
 void avanzar(int velocidad);
@@ -48,19 +56,38 @@ long medirUno(int pinTrig, int pinEcho);
 void medirTodos();
 
 void setup() {
+
+ // Inicialización de la pantalla LCD
+  lcd.init();
+  lcd.backlight();
+  lcd.setCursor(0, 0);
+  lcd.print("Color Detectado:");
+ 
+ // Configuración de pines de motores como salidas
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
   pinMode(ENA, OUTPUT);
   pinMode(IN3, OUTPUT);
   pinMode(IN4, OUTPUT);
   pinMode(ENB, OUTPUT);
-
+ 
+// Configuración de pines de ultrasonidos
   pinMode(TRIG_F, OUTPUT);
   pinMode(ECHO_F, INPUT);
   pinMode(TRIG_I, OUTPUT);
   pinMode(ECHO_I, INPUT);
   pinMode(TRIG_D, OUTPUT);
   pinMode(ECHO_D, INPUT);
+
+ // Configuración de pines del Sensor de Color
+  pinMode(pinS0, OUTPUT);
+  pinMode(pinS1, OUTPUT);
+  pinMode(pinS2, OUTPUT);
+  pinMode(pinS3, OUTPUT);
+  pinMode(pinOut, INPUT);
+ 
+  digitalWrite(pinS0, HIGH);
+  digitalWrite(pinS1, LOW);
 
   Serial.begin(9600);
 }
@@ -131,14 +158,18 @@ void loop() {
     detectedColor = "Rosa";
   }
 
+  if (detectedColor != lastDisplayedColor) {
+    lcd.setCursor(0, 1);
+    lcd.print("                ");
+    lcd.setCursor(0, 1);
+    lcd.print(detectedColor);
+    lastDisplayedColor = detectedColor;
+  }
+
 
   Serial.print("R:"); Serial.print(redFrequency);
   Serial.print(" G:"); Serial.print(greenFrequency);
   Serial.print(" B:"); Serial.println(blueFrequency);
-
-
-  delay(1000);
-   }
 }
 //Movimiento
 
@@ -204,13 +235,8 @@ long medirUno(int pinTrig, int pinEcho) {
 
 void medirTodos() {
   distFrente = medirUno(TRIG_F, ECHO_F);
-  delay(1000); 
-
-  distIzquierda = medirUno(TRIG_I, ECHO_I);
-  delay(1000);
- 
+  distIzquierda = medirUno(TRIG_I, ECHO_I); 
   distDerecha = medirUno(TRIG_D, ECHO_D);
-  delay(1000);
 }
 
 
