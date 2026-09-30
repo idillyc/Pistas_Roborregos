@@ -166,10 +166,6 @@ void loop() {
     lastDisplayedColor = detectedColor;
   }
 
-
-  Serial.print("R:"); Serial.print(redFrequency);
-  Serial.print(" G:"); Serial.print(greenFrequency);
-  Serial.print(" B:"); Serial.println(blueFrequency);
 }
 //Movimiento
 
